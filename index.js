@@ -1,10 +1,8 @@
-import React, {cloneElement, Children, Component, createElement} from 'react';
-import {render} from 'react-dom'
+import { cloneElement, Children, Component, createElement } from 'react';
 import createHistory from 'history/createBrowserHistory';
 import toRegex from 'path-to-regexp';
 import queryString from 'query-string';
 import randomKey from 'random-key';
-import PropTypes from 'prop-types';
 
 const history = createHistory();
 const routes = {};
@@ -22,7 +20,6 @@ class Route extends Component {
     this.params = [];
     this.route = toRegex(props.route, this.params, props.options);
     this.key = randomKey.generate();
-    this.state = {isMatch: false, params: {}, query: {}};
   }
 
   componentWillMount() {
@@ -36,7 +33,7 @@ class Route extends Component {
   }
 
   render() {
-    const {pathname, search} = window.location;
+    const { pathname, search } = window.location;
     const match = this.route.exec(pathname);
     const isMatch = !!match ^ !!this.props.unmatch;
     if (!isMatch) {
@@ -49,10 +46,16 @@ class Route extends Component {
       }
     });
     const query = queryString.parse(search);
-    return cloneElement(Children.only(this.props.children), {params, query});
+    return cloneElement(Children.only(this.props.children), { params, query });
   }
-
 }
+
+const setLocation = (pathname, search = '') => {
+  history.push({
+    pathname,
+    search: typeof search === 'string' ? search : queryString.stringify(search),
+  });
+};
 
 const onLinkClick = (event) => {
   event.preventDefault();
@@ -67,13 +70,9 @@ const onLinkClick = (event) => {
   }
 };
 
-const setLocation = (pathname, search = '') => {
-  history.push({pathname, search : typeof search === 'string'? search : queryString.stringify(search)});
-};
-
 const Link = (props) => {
-  const {component, ...rest} = props;
-  return createElement(component || 'a', {onClick: onLinkClick, ...rest}, rest.children);
+  const { component, ...rest } = props;
+  return createElement(component || 'a', { onClick: onLinkClick, ...rest }, rest.children);
 };
 
-export {Route, setLocation, Link};
+export { Route, setLocation, Link };
