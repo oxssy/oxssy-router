@@ -1,14 +1,14 @@
 import { cloneElement, Children, Component, createElement } from 'react';
 import createHistory from 'history/createBrowserHistory';
 import toRegex from 'path-to-regexp';
-import queryString from 'query-string';
-import randomKey from 'random-key';
+import { parse, stringify } from 'querystring';
+
 
 const history = createHistory();
-const routes = {};
+const routes = new Set();
 
 const resolveRoute = () => {
-  Object.values(routes).forEach(route => route.forceUpdate());
+  routes.forEach(route => route.forceUpdate());
 };
 
 history.listen(resolveRoute);
@@ -17,25 +17,26 @@ history.listen(resolveRoute);
 class Route extends Component {
   constructor(props) {
     super(props);
+    const { route, option } = props;
     this.params = [];
-    this.route = toRegex(props.route, this.params, props.options);
-    this.key = randomKey.generate();
+    this.route = toRegex(route, this.params, option);
   }
 
   componentWillMount() {
-    routes[this.key] = this;
+    routes.add(this);
   }
 
   componentWillUnmount() {
-    if (routes[this.key]) {
-      delete routes[this.key];
+    if (routes.has(this)) {
+      routes.delete(this);
     }
   }
 
   render() {
+    const { children, unmatch } = this.props;
     const { pathname, search } = window.location;
     const match = this.route.exec(pathname);
-    const isMatch = !!match ^ !!this.props.unmatch;
+    const isMatch = !!match ^ !!unmatch;
     if (!isMatch) {
       return null;
     }
@@ -45,15 +46,15 @@ class Route extends Component {
         params[this.params[index - 1].name] = element;
       }
     });
-    const query = queryString.parse(search);
-    return cloneElement(Children.only(this.props.children), { params, query });
+    const query = parse(search);
+    return cloneElement(Children.only(children), { params, query });
   }
 }
 
 const setLocation = (pathname, search = '') => {
   history.push({
     pathname,
-    search: typeof search === 'string' ? search : queryString.stringify(search),
+    search: typeof search === 'string' ? search : stringify(search),
   });
 };
 
