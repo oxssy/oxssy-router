@@ -4,15 +4,14 @@ import toRegex from 'path-to-regexp';
 import { parse, stringify } from 'querystring';
 
 
-const history = createHistory();
-const routes = new Set();
+let history;
+let routes;
 
-const resolveRoute = () => {
-  routes.forEach(route => route.forceUpdate());
+const routerInit = () => {
+  history = createHistory();
+  routes = new Set();
+  history.listen(() => routes.forEach(route => route.forceUpdate()));
 };
-
-history.listen(resolveRoute);
-
 
 class Route extends Component {
   constructor(props) {
@@ -76,4 +75,4 @@ const Link = (props) => {
   return createElement(component || 'a', { onClick: onLinkClick, ...rest }, rest.children);
 };
 
-export { Route, setLocation, Link };
+export { Route, routerInit, setLocation, Link };
