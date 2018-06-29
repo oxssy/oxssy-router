@@ -51,6 +51,9 @@ class Route extends Component {
 }
 
 const setLocation = (pathname, search = '') => {
+  if (!history || !routes) {
+    routerInit();
+  }
   history.push({
     pathname,
     search: typeof search === 'string' ? search : stringify(search),
@@ -75,4 +78,4 @@ const Link = (props) => {
   return createElement(component || 'a', { onClick: onLinkClick, ...rest }, rest.children);
 };
 
-export { Route, routerInit, setLocation, Link };
+export { Route, setLocation, Link };
