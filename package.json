@@ -1,6 +1,6 @@
 {
   "name": "oxssy-router",
-  "version": "0.1.10",
+  "version": "0.1.11",
   "author": "Oxssy <oxssy.ai@gmail.com>",
   "description": "A simple router for react applications",
   "main": "dist/index.js",
