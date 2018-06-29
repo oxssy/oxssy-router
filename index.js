@@ -22,11 +22,14 @@ class Route extends Component {
   }
 
   componentWillMount() {
+    if (!history || !routes) {
+      routerInit();
+    }
     routes.add(this);
   }
 
   componentWillUnmount() {
-    if (routes.has(this)) {
+    if (routes && routes.has(this)) {
       routes.delete(this);
     }
   }
